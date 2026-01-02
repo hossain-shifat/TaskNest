@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Award, TrendingUp } from 'lucide-react';
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 // Mock data for development - replace with actual API call
 const mockWorkers = [
@@ -59,7 +63,9 @@ const BestWorkers = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const sectionRef = useRef(null);
+    const titleRef = useRef(null);
     const cardsRef = useRef([]);
+    const ctaRef = useRef(null);
 
     // Fetch top workers from API
     useEffect(() => {
@@ -98,52 +104,158 @@ const BestWorkers = () => {
         fetchTopWorkers();
     }, []);
 
-    // GSAP animations
+    // GSAP animations with ScrollTrigger
     useEffect(() => {
         if (workers.length === 0 || loading) return;
 
         const ctx = gsap.context(() => {
-            // Animate section title
-            gsap.from('.section-title', {
+            // Title animation with ScrollTrigger
+            gsap.from(titleRef.current, {
+                scrollTrigger: {
+                    trigger: titleRef.current,
+                    start: 'top 85%',
+                    end: 'top 60%',
+                    scrub: 1,
+                },
                 opacity: 0,
-                y: -30,
-                duration: 0.8,
-                ease: 'power3.out'
+                y: -50,
+                scale: 0.9,
+                duration: 1
             });
 
-            // Animate cards with stagger
-            gsap.from(cardsRef.current, {
-                opacity: 0,
-                y: 60,
-                duration: 0.8,
-                stagger: 0.1,
-                ease: 'power3.out',
-                delay: 0.2
-            });
-
-            // Add hover animations
-            cardsRef.current.forEach((card) => {
+            // Individual card animations with complex effects
+            cardsRef.current.forEach((card, index) => {
                 if (!card) return;
 
-                card.addEventListener('mouseenter', () => {
-                    gsap.to(card, {
+                const direction = index % 2 === 0 ? -100 : 100;
+                const rotation = index % 2 === 0 ? -5 : 5;
+
+                // Create timeline for each card
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 90%',
+                        end: 'top 50%',
+                        scrub: 1.5,
+                    }
+                });
+
+                tl.from(card, {
+                    x: direction,
+                    y: 80,
+                    opacity: 0,
+                    scale: 0.8,
+                    rotation: rotation,
+                    duration: 1,
+                    ease: 'power3.out'
+                })
+                    .to(card, {
+                        x: 0,
+                        y: 0,
+                        opacity: 1,
+                        scale: 1,
+                        rotation: 0,
+                        duration: 1,
+                        ease: 'power3.out'
+                    });
+            });
+
+            // CTA animation with ScrollTrigger
+            if (ctaRef.current) {
+                gsap.from(ctaRef.current, {
+                    scrollTrigger: {
+                        trigger: ctaRef.current,
+                        start: 'top 90%',
+                        end: 'top 70%',
+                        scrub: 1,
+                    },
+                    opacity: 0,
+                    y: 40,
+                    scale: 0.95,
+                    duration: 0.8
+                });
+            }
+
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, [workers, loading]);
+
+    // Hover interactions using GSAP
+    useEffect(() => {
+        if (workers.length === 0 || loading) return;
+
+        cardsRef.current.forEach((card) => {
+            if (!card) return;
+
+            const handleMouseEnter = () => {
+                gsap.to(card, {
+                    scale: 1.05,
+                    y: -10,
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)',
+                    duration: 0.4,
+                    ease: 'power2.out'
+                });
+
+                // Animate rank badge
+                const badge = card.querySelector('.rank-badge');
+                if (badge) {
+                    gsap.to(badge, {
+                        rotation: 360,
+                        scale: 1.15,
+                        duration: 0.6,
+                        ease: 'back.out(1.7)'
+                    });
+                }
+
+                // Animate coin display
+                const coinDisplay = card.querySelector('.coin-display');
+                if (coinDisplay) {
+                    gsap.to(coinDisplay, {
                         scale: 1.05,
                         duration: 0.3,
                         ease: 'power2.out'
                     });
+                }
+            };
+
+            const handleMouseLeave = () => {
+                gsap.to(card, {
+                    scale: 1,
+                    y: 0,
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    duration: 0.4,
+                    ease: 'power2.out'
                 });
 
-                card.addEventListener('mouseleave', () => {
-                    gsap.to(card, {
+                const badge = card.querySelector('.rank-badge');
+                if (badge) {
+                    gsap.to(badge, {
+                        rotation: 0,
+                        scale: 1,
+                        duration: 0.6,
+                        ease: 'back.out(1.7)'
+                    });
+                }
+
+                const coinDisplay = card.querySelector('.coin-display');
+                if (coinDisplay) {
+                    gsap.to(coinDisplay, {
                         scale: 1,
                         duration: 0.3,
                         ease: 'power2.out'
                     });
-                });
-            });
-        }, sectionRef);
+                }
+            };
 
-        return () => ctx.revert();
+            card.addEventListener('mouseenter', handleMouseEnter);
+            card.addEventListener('mouseleave', handleMouseLeave);
+
+            return () => {
+                card.removeEventListener('mouseenter', handleMouseEnter);
+                card.removeEventListener('mouseleave', handleMouseLeave);
+            };
+        });
     }, [workers, loading]);
 
     // Get rank badge color
@@ -216,7 +328,7 @@ const BestWorkers = () => {
         <section ref={sectionRef} className="py-20 px-4 bg-base-100 overflow-hidden">
             <div className="max-w-7xl mx-auto">
                 {/* Section Header */}
-                <div className="text-center mb-16 section-title">
+                <div ref={titleRef} className="text-center mb-16">
                     <div className="inline-flex items-center gap-2 bg-accent/10 px-4 py-2 rounded-full mb-4">
                         <TrendingUp className="w-5 h-5 text-accent" />
                         <span className="text-sm font-semibold text-accent uppercase tracking-wide">
@@ -232,7 +344,7 @@ const BestWorkers = () => {
                 </div>
 
                 {/* Workers Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 *:z-20">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     {workers.map((worker, index) => {
                         const rankBadge = getRankBadge(index);
 
@@ -244,7 +356,7 @@ const BestWorkers = () => {
                                 aria-label={`${worker.name} - ${worker.coin} coins`}
                             >
                                 {/* Rank Badge */}
-                                <div className={`absolute -top-4 -right-4 w-14 h-14 rounded-full bg-linear-to-br ${rankBadge.color} flex items-center justify-center text-2xl shadow-lg z-10`}>
+                                <div className={`rank-badge absolute -top-4 -right-4 w-14 h-14 rounded-full bg-gradient-to-br ${rankBadge.color} flex items-center justify-center text-2xl shadow-lg z-10`}>
                                     {rankBadge.icon}
                                 </div>
 
@@ -282,7 +394,7 @@ const BestWorkers = () => {
                                     </p>
 
                                     {/* Coins Display */}
-                                    <div className="bg-linear-to-r from-accent/20 to-accent/10 rounded-xl p-4 border border-accent/30">
+                                    <div className="coin-display bg-gradient-to-r from-accent/20 to-accent/10 rounded-xl p-4 border border-accent/30">
                                         <div className="flex items-center justify-center gap-2">
                                             <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
                                                 <span className="text-xl">🪙</span>
@@ -300,14 +412,14 @@ const BestWorkers = () => {
                                 </div>
 
                                 {/* Decorative elements */}
-                                <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-accent/0 via-accent/50 to-accent/0 rounded-t-2xl"></div>
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/0 via-accent/50 to-accent/0 rounded-t-2xl"></div>
                             </article>
                         );
                     })}
                 </div>
 
                 {/* Call to Action */}
-                <div className="text-center mt-12">
+                <div ref={ctaRef} className="text-center mt-12">
                     <p className="text-base-content/70 mb-4">
                         Want to join the leaderboard?
                     </p>
@@ -324,4 +436,4 @@ const BestWorkers = () => {
     );
 };
 
-export default BestWorkers
+export default BestWorkers;
