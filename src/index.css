@@ -1,2 +1,173 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0.003 264);
+  --color-base-300: oklch(94% 0.005 264);
+  --color-base-content: oklch(18% 0.01 264);
+
+  --color-primary: oklch(52% 0.22 264);
+  --color-primary-content: oklch(98% 0.01 264);
+
+  --color-secondary: oklch(62% 0.18 180);
+  --color-secondary-content: oklch(98% 0.01 180);
+
+  --color-accent: oklch(70% 0.16 65);
+  --color-accent-content: oklch(25% 0.06 65);
+
+  --color-neutral: oklch(20% 0.01 264);
+  --color-neutral-content: oklch(96% 0.005 264);
+
+  --color-info: oklch(68% 0.18 240);
+  --color-info-content: oklch(20% 0.06 240);
+
+  --color-success: oklch(68% 0.17 145);
+  --color-success-content: oklch(20% 0.07 145);
+
+  --color-warning: oklch(75% 0.17 55);
+  --color-warning-content: oklch(22% 0.08 55);
+
+  --color-error: oklch(62% 0.22 25);
+  --color-error-content: oklch(98% 0.01 25);
+
+  --radius-selector: 0.75rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 2;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: true;
+  prefersdark: true;
+  color-scheme: "dark";
+
+  --color-base-100: oklch(30% 0.012 264);
+  --color-base-200: oklch(27% 0.012 264);
+  --color-base-300: oklch(24% 0.012 264);
+  --color-base-content: oklch(92% 0.01 264);
+
+  --color-primary: oklch(62% 0.24 264);
+  --color-primary-content: oklch(12% 0.02 264);
+
+  --color-secondary: oklch(68% 0.20 180);
+  --color-secondary-content: oklch(12% 0.02 180);
+
+  --color-accent: oklch(78% 0.18 65);
+  --color-accent-content: oklch(15% 0.06 65);
+
+  --color-neutral: oklch(35% 0.012 264);
+  --color-neutral-content: oklch(92% 0.01 264);
+
+  --color-info: oklch(72% 0.20 240);
+  --color-info-content: oklch(12% 0.02 240);
+
+  --color-success: oklch(72% 0.19 145);
+  --color-success-content: oklch(12% 0.02 145);
+
+  --color-warning: oklch(78% 0.19 55);
+  --color-warning-content: oklch(15% 0.06 55);
+
+  --color-error: oklch(68% 0.24 25);
+  --color-error-content: oklch(12% 0.02 25);
+
+  --radius-selector: 0.75rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 3;
+  --noise: 0;
+}
+
+.text-coin {
+  color: oklch(78% 0.18 65);
+}
+
+.bg-coin {
+  background-color: oklch(78% 0.18 65);
+}
+
+.border-coin {
+  border-color: oklch(78% 0.18 65);
+}
+
+.status-pending {
+  color: oklch(78% 0.19 55);
+}
+
+.status-approved {
+  color: oklch(72% 0.19 145);
+}
+
+.status-rejected {
+  color: oklch(68% 0.24 25);
+}
+
+.badge-worker {
+  background-color: oklch(68% 0.20 180);
+  color: oklch(12% 0.02 180);
+}
+
+.badge-buyer {
+  background-color: oklch(62% 0.24 264);
+  color: oklch(12% 0.02 264);
+}
+
+.badge-admin {
+  background-color: oklch(68% 0.24 25);
+  color: oklch(12% 0.02 25);
+}
+
+.earning-highlight {
+  background: linear-gradient(135deg,
+    oklch(78% 0.18 65) 0%,
+    oklch(68% 0.20 180) 100%);
+  color: oklch(12% 0.02 65);
+}
+
+.task-card {
+  transition: all 0.3s ease;
+}
+
+.task-card:hover {
+  box-shadow: 0 8px 24px oklch(62% 0.24 264 / 0.15);
+  transform: translateY(-2px);
+}
+
+.stat-card {
+  background: linear-gradient(135deg,
+    oklch(62% 0.24 264 / 0.1) 0%,
+    oklch(68% 0.20 180 / 0.1) 100%);
+  border: 1px solid oklch(62% 0.24 264 / 0.2);
+}
+
+.notification-badge {
+  background-color: oklch(68% 0.24 25);
+  color: oklch(98% 0.01 25);
+}
+
+[data-theme="light"] {
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.05);
+  --shadow-md: 0 4px 6px oklch(0% 0 0 / 0.07);
+  --shadow-lg: 0 10px 15px oklch(0% 0 0 / 0.1);
+}
+
+[data-theme="dark"] {
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.3);
+  --shadow-md: 0 4px 6px oklch(0% 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px oklch(0% 0 0 / 0.5);
+  --glow-primary: 0 0 20px oklch(62% 0.24 264 / 0.3);
+  --glow-accent: 0 0 20px oklch(78% 0.18 65 / 0.3);
+}
