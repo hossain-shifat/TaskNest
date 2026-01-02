@@ -75,7 +75,7 @@ const Slider = ({
                 <button
                     onClick={prevSlide}
                     disabled={isTransitioning}
-                    className="btn btn-circle btn-primary hover:scale-110 transition-transform disabled:opacity-50"
+                    className="btn btn-circle btn-accent hover:scale-110 transition-transform disabled:opacity-50"
                     aria-label="Previous slide"
                 >
                     <ChevronLeft className="w-6 h-6" />
@@ -89,8 +89,8 @@ const Slider = ({
                             onClick={() => goToSlide(index)}
                             disabled={isTransitioning}
                             className={`transition-all duration-300 rounded-full ${index === currentSlide
-                                    ? 'w-10 h-3 bg-primary'
-                                    : 'w-3 h-3 bg-base-300 hover:bg-primary/50'
+                                    ? 'w-10 h-3 bg-accent'
+                                    : 'w-3 h-3 bg-base-300 hover:bg-accent/50'
                                 }`}
                             aria-label={`Go to slide ${index + 1}`}
                             aria-current={index === currentSlide ? 'true' : 'false'}
@@ -102,7 +102,7 @@ const Slider = ({
                 <button
                     onClick={nextSlide}
                     disabled={isTransitioning}
-                    className="btn btn-circle btn-primary hover:scale-110 transition-transform disabled:opacity-50"
+                    className="btn btn-circle btn-accent hover:scale-110 transition-transform disabled:opacity-50"
                     aria-label="Next slide"
                 >
                     <ChevronRight className="w-6 h-6" />

@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* =========================
+   LIGHT THEME
+========================= */
 @plugin "daisyui/theme" {
   name: "light";
   default: false;
@@ -18,8 +21,9 @@
   --color-secondary: oklch(62% 0.18 180);
   --color-secondary-content: oklch(98% 0.01 180);
 
-  --color-accent: oklch(70% 0.16 65);
-  --color-accent-content: oklch(25% 0.06 65);
+  /* ✅ UPDATED ACCENT */
+  --color-accent: oklch(77% 0.152 181.912);
+  --color-accent-content: oklch(38% 0.063 188.416);
 
   --color-neutral: oklch(20% 0.01 264);
   --color-neutral-content: oklch(96% 0.005 264);
@@ -39,13 +43,14 @@
   --radius-selector: 0.75rem;
   --radius-field: 0.5rem;
   --radius-box: 0.75rem;
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
   --border: 1px;
   --depth: 2;
   --noise: 0;
 }
 
+/* =========================
+   DARK THEME
+========================= */
 @plugin "daisyui/theme" {
   name: "dark";
   default: true;
@@ -63,8 +68,9 @@
   --color-secondary: oklch(68% 0.20 180);
   --color-secondary-content: oklch(12% 0.02 180);
 
-  --color-accent: oklch(78% 0.18 65);
-  --color-accent-content: oklch(15% 0.06 65);
+  /* ✅ UPDATED ACCENT */
+  --color-accent: oklch(77% 0.152 181.912);
+  --color-accent-content: oklch(38% 0.063 188.416);
 
   --color-neutral: oklch(35% 0.012 264);
   --color-neutral-content: oklch(92% 0.01 264);
@@ -84,25 +90,29 @@
   --radius-selector: 0.75rem;
   --radius-field: 0.5rem;
   --radius-box: 0.75rem;
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
   --border: 1px;
   --depth: 3;
   --noise: 0;
 }
 
+/* =========================
+   ACCENT UTILITIES (UPDATED)
+========================= */
 .text-coin {
-  color: oklch(78% 0.18 65);
+  color: oklch(77% 0.152 181.912);
 }
 
 .bg-coin {
-  background-color: oklch(78% 0.18 65);
+  background-color: oklch(77% 0.152 181.912);
 }
 
 .border-coin {
-  border-color: oklch(78% 0.18 65);
+  border-color: oklch(77% 0.152 181.912);
 }
 
+/* =========================
+   STATUS COLORS
+========================= */
 .status-pending {
   color: oklch(78% 0.19 55);
 }
@@ -115,6 +125,9 @@
   color: oklch(68% 0.24 25);
 }
 
+/* =========================
+   ROLE BADGES
+========================= */
 .badge-worker {
   background-color: oklch(68% 0.20 180);
   color: oklch(12% 0.02 180);
@@ -130,11 +143,16 @@
   color: oklch(12% 0.02 25);
 }
 
+/* =========================
+   HIGHLIGHTS & CARDS
+========================= */
 .earning-highlight {
-  background: linear-gradient(135deg,
-    oklch(78% 0.18 65) 0%,
-    oklch(68% 0.20 180) 100%);
-  color: oklch(12% 0.02 65);
+  background: linear-gradient(
+    135deg,
+    oklch(77% 0.152 181.912) 0%,
+    oklch(68% 0.20 180) 100%
+  );
+  color: oklch(12% 0.02 180);
 }
 
 .task-card {
@@ -147,10 +165,12 @@
 }
 
 .stat-card {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     oklch(62% 0.24 264 / 0.1) 0%,
-    oklch(68% 0.20 180 / 0.1) 100%);
-  border: 1px solid oklch(62% 0.24 264 / 0.2);
+    oklch(77% 0.152 181.912 / 0.12) 100%
+  );
+  border: 1px solid oklch(77% 0.152 181.912 / 0.25);
 }
 
 .notification-badge {
@@ -168,10 +188,31 @@
   --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.3);
   --shadow-md: 0 4px 6px oklch(0% 0 0 / 0.4);
   --shadow-lg: 0 10px 15px oklch(0% 0 0 / 0.5);
-  --glow-primary: 0 0 20px oklch(62% 0.24 264 / 0.3);
-  --glow-accent: 0 0 20px oklch(78% 0.18 65 / 0.3);
+
+  --glow-primary: 0 0 18px oklch(62% 0.24 264 / 0.3);
+  --glow-accent: 0 0 22px oklch(77% 0.152 181.912 / 0.35);
 }
 
-.active{
-    @apply text-primary underline underline-offset-3 font-bold
+.active {
+  @apply relative font-semibold text-accent;
+}
+
+/* underline stays INSIDE li padding */
+.active::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;           /* aligns with li p-3 */
+  right: 0.75rem;
+  bottom: 0.35rem;        /* inside the li, not outside */
+  height: 3px;
+  border-radius: 999px;
+  background: oklch(77% 0.152 181.912);
+  transition: all 0.25s ease;
+}
+
+/* dark mode highlight WITHOUT padding */
+[data-theme="dark"] .active {
+  background-color: oklch(77% 0.152 181.912 / 0.12);
+  border-radius: 0.75rem; /* matches p-3 shape */
+  box-shadow: var(--glow-accent);
 }
