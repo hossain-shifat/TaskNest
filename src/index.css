@@ -171,3 +171,7 @@
   --glow-primary: 0 0 20px oklch(62% 0.24 264 / 0.3);
   --glow-accent: 0 0 20px oklch(78% 0.18 65 / 0.3);
 }
+
+.active{
+    @apply text-primary underline underline-offset-3 font-bold
+}
