@@ -54,7 +54,6 @@ const Navbar = () => {
         <header className="sticky top-0 z-50 w-full border-b border-base-300 bg-base-300">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between gap-4">
-
                     {/* Left Section: Logo + Desktop Nav */}
                     <div className="flex items-center gap-8">
                         <Logo closeMenu={closeMenu} />
