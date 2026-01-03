@@ -356,7 +356,7 @@ const BestWorkers = () => {
                                 aria-label={`${worker.name} - ${worker.coin} coins`}
                             >
                                 {/* Rank Badge */}
-                                <div className={`rank-badge absolute -top-4 -right-4 w-14 h-14 rounded-full bg-gradient-to-br ${rankBadge.color} flex items-center justify-center text-2xl shadow-lg z-10`}>
+                                <div className={`rank-badge absolute -top-4 -right-4 w-14 h-14 rounded-full bg-linear-to-br ${rankBadge.color} flex items-center justify-center text-2xl shadow-lg z-10`}>
                                     {rankBadge.icon}
                                 </div>
 
@@ -394,7 +394,7 @@ const BestWorkers = () => {
                                     </p>
 
                                     {/* Coins Display */}
-                                    <div className="coin-display bg-gradient-to-r from-accent/20 to-accent/10 rounded-xl p-4 border border-accent/30">
+                                    <div className="coin-display bg-linear-to-r from-accent/20 to-accent/10 rounded-xl p-4 border border-accent/30">
                                         <div className="flex items-center justify-center gap-2">
                                             <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
                                                 <span className="text-xl">🪙</span>
@@ -412,7 +412,7 @@ const BestWorkers = () => {
                                 </div>
 
                                 {/* Decorative elements */}
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/0 via-accent/50 to-accent/0 rounded-t-2xl"></div>
+                                <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-accent/0 via-accent/50 to-accent/0 rounded-t-2xl"></div>
                             </article>
                         );
                     })}

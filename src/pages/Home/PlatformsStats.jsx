@@ -150,7 +150,7 @@ const PlatformStats = () => {
     return (
         <section ref={sectionRef} className="py-20 px-4 bg-base-100 relative overflow-hidden">
             {/* Background decoration */}
-            <div className="stats-bg absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 -z-10"></div>
+            <div className="stats-bg absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5 -z-10"></div>
 
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-16 stats-heading">
@@ -176,9 +176,9 @@ const PlatformStats = () => {
                                 ref={(el) => (statsRef.current[index] = el)}
                                 className="group"
                             >
-                                <div className={`relative bg-gradient-to-br ${stat.gradient} rounded-2xl p-8 border border-base-300 shadow-lg hover:shadow-2xl transition-all duration-300 h-full`}>
+                                <div className={`relative bg-linear-to-br ${stat.gradient} rounded-2xl p-8 border border-base-300 shadow-lg hover:shadow-2xl transition-all duration-300 h-full`}>
                                     {/* Glow effect on hover */}
-                                    <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} rounded-2xl opacity-0 group-hover:opacity-50 blur-xl transition-opacity duration-300 -z-10`}></div>
+                                    <div className={`absolute inset-0 bg-linear-to-br ${stat.gradient} rounded-2xl opacity-0 group-hover:opacity-50 blur-xl transition-opacity duration-300 -z-10`}></div>
 
                                     {/* Icon */}
                                     <div className="stat-icon mb-6">
@@ -213,7 +213,7 @@ const PlatformStats = () => {
                                     </p>
 
                                     {/* Decorative line */}
-                                    <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-${stat.color}/50 to-transparent rounded-b-2xl`}></div>
+                                    <div className={`absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-${stat.color}/50 to-transparent rounded-b-2xl`}></div>
                                 </div>
                             </div>
                         );
