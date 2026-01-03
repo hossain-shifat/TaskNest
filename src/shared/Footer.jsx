@@ -164,7 +164,7 @@ const Footer = () => {
             <div className="border-t border-base-300">
                 <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
                     <p className="text-sm text-base-content/60">
-                        © {currentYear} MicroTaskPro. All rights reserved.
+                        © {currentYear} TaskNest. All rights reserved.
                     </p>
 
                     <div className="flex gap-3">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { NavLink } from 'react-router'
-import { Moon, Sun, Menu, X, Github, Coins, LogOut, LayoutDashboard, Bell, Home, User, ListTodo, Plus, Wallet, History, Users, Settings } from 'lucide-react'
+import { Moon, Sun, Menu, X, Github, Coins, LogOut, LayoutDashboard, Bell, Home, User, ListTodo, Plus, Wallet, History, Users, Settings, Info, PhoneCall } from 'lucide-react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 
@@ -17,7 +17,7 @@ const useTheme = () => {
 const useAuth = () => {
     // Replace with your actual auth hook
     return {
-        isLoggedIn: true,
+        isLoggedIn: false,
         user: {
             name: "John Doe",
             email: "john@example.com",
@@ -84,7 +84,9 @@ const Navbar = () => {
     // Navigation Links Configuration
     const navigationLinks = {
         public: [
-            { to: '/', label: 'Home', icon: Home }
+            { to: '/', label: 'Home', icon: Home },
+            { to: '/about', label: 'About', icon: Info },
+            { to: '/contact', label: 'Contact', icon: PhoneCall },
         ],
         worker: [
             { to: '/', label: 'Home', icon: Home },
@@ -158,7 +160,7 @@ const Navbar = () => {
                         <div className="flex items-center gap-2 sm:gap-3">
                             {/* Available Coins - Logged In Only */}
                             {isLoggedIn && (
-                                <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-accent/10 to-warning/10 border border-accent/20 rounded-lg hover:border-accent/40 transition-all cursor-pointer group">
+                                <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-linear-to-r from-accent/10 to-warning/10 border border-accent/20 rounded-lg hover:border-accent/40 transition-all cursor-pointer group">
                                     <div className="relative">
                                         <Coins className="size-5 text-accent group-hover:scale-110 transition-transform" />
                                         <div className="absolute inset-0 bg-accent/20 rounded-full blur-md group-hover:bg-accent/40 transition-colors"></div>
@@ -346,7 +348,7 @@ const Navbar = () => {
                     <div className="container mx-auto px-4 py-6 space-y-4">
                         {/* Mobile User Info - Logged In */}
                         {isLoggedIn && (
-                            <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-4">
+                            <div className="bg-linear-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-4">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="avatar">
                                         <div className="w-14 rounded-full ring-2 ring-primary">

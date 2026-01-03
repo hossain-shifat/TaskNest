@@ -16,14 +16,14 @@ const Logo = ({ closeMenu }) => {
         tl.from(iconRef.current, {
             scale: 0,
             rotation: -180,
-            opacity: 0,
+            // opacity: 0,
             duration: 0.6,
             ease: 'back.out(1.7)',
         })
 
         // Animate text (fade & slide)
         tl.from(textRef.current, {
-            opacity: 0,
+            // opacity: 0,
             x: -20,
             duration: 0.5,
             ease: 'power2.out',
@@ -66,7 +66,7 @@ const Logo = ({ closeMenu }) => {
                     <img
                         src={logo}
                         alt="TaskNest Logo"
-                        className="w-8 h-8 object-contain"
+                        className="w-8 h-8 object-contain opacity-100"
                     />
                 </div>
 
