@@ -5,6 +5,8 @@ import Logo from '../components/Logo'
 import { AuthContext } from '../context/Auth/AuthCOntext'
 import useAuth from '../hooks/useAuth'
 import useRole from '../hooks/useRole'
+import { useQuery } from '@tanstack/react-query'
+import useAxiosSecure from '../hooks/UseAxiosSecure'
 
 const useTheme = () => {
     const [theme, setTheme] = useState('dark')
@@ -22,6 +24,7 @@ const Navbar = () => {
     const { role, roleLoading } = useRole()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [notificationOpen, setNotificationOpen] = useState(false)
+    const axiosSecure = useAxiosSecure()
     const [notifications] = useState([
         {
             id: 1,
@@ -113,7 +116,15 @@ const Navbar = () => {
 
     const currentLinks = getCurrentLinks()
 
-    console.log(user)
+    const { data: loggedInUser, isLoading, error, refetch } = useQuery({
+        queryKey: ['loggedInUser', user?.email],
+        enabled: !!user?.email,
+        queryFn: async () => {
+            const res = await axiosSecure.get(`/users/${user.email}`);
+            return res.data;
+        }
+    });
+
     return (
         <>
             <header
@@ -157,7 +168,7 @@ const Navbar = () => {
                                     </div>
                                     <div className="flex flex-col leading-none">
                                         <span className="text-xs text-base-content/60 font-medium">Balance</span>
-                                        <span className="text-sm font-bold text-accent">{user?.coin || 0}</span>
+                                        <span className="text-sm font-bold text-accent">{loggedInUser?.coin || 0}</span>
                                     </div>
                                 </div>
                             )}
@@ -358,7 +369,7 @@ const Navbar = () => {
                                     <Coins className="size-5 text-accent" />
                                     <div className="flex flex-col leading-none">
                                         <span className="text-xs text-base-content/60">Available Coins</span>
-                                        <span className="text-sm font-bold text-accent">{user?.coin || 0}</span>
+                                        <span className="text-sm font-bold text-accent">{loggedInUser?.coin || 0}</span>
                                     </div>
                                 </div>
                             </div>
