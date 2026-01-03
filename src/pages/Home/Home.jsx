@@ -5,6 +5,7 @@ import Testimonial from './Testimonial'
 import HowItWorks from './HowItWorks'
 import PlatformStats from './PlatformsStats'
 import CallToAction from './CallToAction'
+import FAQ from './FAQ'
 
 const Home = () => {
     return (
@@ -12,9 +13,10 @@ const Home = () => {
             <Banner />
             <BestWorkers />
             <Testimonial />
-            <HowItWorks/>
+            <HowItWorks />
             <CallToAction />
-            <PlatformStats/>
+            <PlatformStats />
+            <FAQ />
         </div>
     )
 }
