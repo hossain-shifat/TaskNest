@@ -6,24 +6,35 @@ import logo from '../assets/logo.png'
 const Logo = ({ closeMenu }) => {
     const logoRef = useRef(null)
     const iconRef = useRef(null)
+    const textRef = useRef(null)
 
     useEffect(() => {
-        gsap.fromTo(
-            logoRef.current,
-            { opacity: 0, y: -8 },
-            {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                ease: 'power2.out',
-            }
-        )
+        // Create a timeline for coordinated animations
+        const tl = gsap.timeline()
+
+        // Animate logo icon (scale + rotation)
+        tl.from(iconRef.current, {
+            scale: 0,
+            rotation: -180,
+            opacity: 0,
+            duration: 0.6,
+            ease: 'back.out(1.7)',
+        })
+
+        // Animate text (fade & slide)
+        tl.from(textRef.current, {
+            opacity: 0,
+            x: -20,
+            duration: 0.5,
+            ease: 'power2.out',
+        }, '-=0.3') // Start 0.3s before icon animation ends
+
     }, [])
 
     const handleMouseEnter = () => {
         gsap.to(iconRef.current, {
             scale: 1.08,
-            rotate: 2,
+            rotate: 5,
             duration: 0.3,
             ease: 'power2.out',
         })
@@ -34,7 +45,7 @@ const Logo = ({ closeMenu }) => {
             scale: 1,
             rotate: 0,
             duration: 0.3,
-            ease: 'power2.out',
+            ease: 'power1.out',
         })
     }
 
@@ -60,7 +71,7 @@ const Logo = ({ closeMenu }) => {
                 </div>
 
                 {/* Brand Text */}
-                <div className="flex flex-col leading-none">
+                <div ref={textRef} className="flex flex-col leading-none">
                     <span className="text-xl font-semibold text-base-content tracking-tight">
                         TaskNest
                     </span>
