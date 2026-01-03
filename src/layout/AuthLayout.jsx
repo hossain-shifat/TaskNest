@@ -77,7 +77,7 @@ const AuthLayout = () => {
 
                 {/* Minimal branding */}
                 <div className="text-center mt-6 text-sm text-base-content/60">
-                    <p>Micro Task Platform © 2026</p>
+                    <p>TaskNest Platform © 2026</p>
                 </div>
             </div>
         </div>

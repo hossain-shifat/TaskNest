@@ -12,6 +12,8 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-query": "^5.90.16",
+    "axios": "^1.13.2",
     "firebase": "^12.7.0",
     "gsap": "^3.14.2",
     "lucide-react": "^0.562.0",
@@ -20,6 +22,7 @@
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.69.0",
     "react-router": "^7.11.0",
+    "recharts": "^3.6.0",
     "sweetalert2": "^11.26.17",
     "tailwindcss": "^4.1.18",
     "toastify": "^2.0.1"

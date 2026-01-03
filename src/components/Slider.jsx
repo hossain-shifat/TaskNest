@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const Slider = ({
     slides,
     autoPlay = true,
-    autoPlayInterval = 5000,
+    autoPlayInterval = 1000,
     onSlideChange,
     renderSlide
 }) => {

@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { NavLink } from 'react-router'
-import { Moon, Sun, Menu, X, Github, Coins, LogOut, LayoutDashboard, Bell, Home, User, ListTodo, Plus, Wallet, History, Users, Settings, Info, PhoneCall, HeartHandshake, MessageCircleQuestionMark } from 'lucide-react'
-import gsap from 'gsap'
-import { useGSAP } from '@gsap/react'
+import { Moon, Sun, Menu, X, Github, Coins, LogOut, LayoutDashboard, Bell, Home, ListTodo, Plus, Wallet, History, Users, Settings, Info, PhoneCall, HeartHandshake, HelpCircle, UserIcon } from 'lucide-react'
+import Logo from '../components/Logo'
+import { AuthContext } from '../context/Auth/AuthCOntext'
+import useAuth from '../hooks/useAuth'
+import useRole from '../hooks/useRole'
 
-// Mock hooks - Replace with your actual implementations
 const useTheme = () => {
     const [theme, setTheme] = useState('dark')
     const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
@@ -14,27 +15,11 @@ const useTheme = () => {
     return { theme, toggleTheme }
 }
 
-const useAuth = () => {
-    // Replace with your actual auth hook
-    return {
-        isLoggedIn: false,
-        user: {
-            name: "John Doe",
-            email: "john@example.com",
-            role: "Worker", // Worker | Buyer | Admin
-            image: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-            coins: 1250
-        },
-        logout: () => console.log('Logout')
-    }
-}
-
-// Logo component is imported from '../components/Logo'
-import Logo from '../components/Logo'
-
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme()
-    const { isLoggedIn, user, logout } = useAuth()
+    const { loading, logOut } = useContext(AuthContext)
+    const { user } = useAuth()
+    const { role, roleLoading } = useRole()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [notificationOpen, setNotificationOpen] = useState(false)
     const [notifications] = useState([
@@ -61,14 +46,22 @@ const Navbar = () => {
         }
     ])
 
-
-    // GitHub repository URL - Replace with your actual repo
     const githubRepoUrl = "https://github.com/yourusername/micro-task-platform"
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
     const closeMenu = () => setIsMenuOpen(false)
 
-    // Close notification on outside click
+    const isLoggedIn = !!user
+
+    const handleLogout = async () => {
+        try {
+            await logOut()
+            closeMenu()
+        } catch (error) {
+            console.error('Logout error:', error)
+        }
+    }
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (notificationOpen && !event.target.closest('.notification-dropdown')) {
@@ -81,24 +74,23 @@ const Navbar = () => {
 
     const unreadCount = notifications.filter(n => !n.read).length
 
-    // Navigation Links Configuration
     const navigationLinks = {
         public: [
             { to: '/', label: 'Home', icon: Home },
             { to: '/about', label: 'About', icon: Info },
             { to: '/contact', label: 'Contact', icon: PhoneCall },
             { to: '/terms/privacy', label: 'Privacy & Policy', icon: HeartHandshake },
-            { to: '/help', label: 'Help', icon: MessageCircleQuestionMark },
+            { to: '/help', label: 'Help', icon: HelpCircle },
         ],
         worker: [
-            { to: '/', label: 'Home', icon: Home },
+            // { to: '/', label: 'Home', icon: Home },
             { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
             { to: '/dashboard/task-list', label: 'Task List', icon: ListTodo },
             { to: '/dashboard/my-submissions', label: 'My Submissions', icon: History },
             { to: '/dashboard/withdrawals', label: 'Withdrawals', icon: Wallet }
         ],
         buyer: [
-            { to: '/', label: 'Home', icon: Home },
+            // { to: '/', label: 'Home', icon: Home },
             { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
             { to: '/dashboard/add-task', label: 'Add New Task', icon: Plus },
             { to: '/dashboard/my-tasks', label: 'My Tasks', icon: ListTodo },
@@ -106,37 +98,35 @@ const Navbar = () => {
             { to: '/dashboard/payment-history', label: 'Payment History', icon: History }
         ],
         admin: [
-            { to: '/', label: 'Home', icon: Home },
+            // { to: '/', label: 'Home', icon: Home },
             { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
             { to: '/dashboard/manage-users', label: 'Manage Users', icon: Users },
             { to: '/dashboard/manage-tasks', label: 'Manage Tasks', icon: Settings }
         ]
     }
 
-    // Get current user's navigation links
     const getCurrentLinks = () => {
         if (!isLoggedIn) return navigationLinks.public
-        const role = user.role.toLowerCase()
-        return navigationLinks[role] || navigationLinks.public
+        const userRole = role || 'worker'
+        return navigationLinks[userRole] || navigationLinks.public
     }
 
     const currentLinks = getCurrentLinks()
 
+    console.log(user)
     return (
         <>
             <header
                 className="fixed top-0 left-0 right-0 z-50 w-full border-b border-base-300 bg-base-100/95  shadow-md"
             >
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto">
                     <div className="flex h-16 items-center justify-between gap-4">
-                        {/* Left Section: Logo + Desktop Nav */}
-                        <div className="flex items-center gap-8">
+                        <div className="flex items-center gap-2">
                             <div>
                                 <Logo closeMenu={closeMenu} />
                             </div>
 
-                            {/* Desktop Navigation */}
-                            <nav className="hidden lg:flex items-center gap-1">
+                            <nav className="hidden lg:flex items-center gap-2">
                                 {currentLinks.map((link) => {
                                     const Icon = link.icon
                                     return (
@@ -144,7 +134,7 @@ const Navbar = () => {
                                             key={link.to}
                                             to={link.to}
                                             className={({ isActive }) =>
-                                                `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
+                                                `flex items-center gap-2 px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
                                                     ? 'active text-accent bg-accent/10'
                                                     : 'text-base-content hover:text-accent hover:bg-base-200/70'
                                                 }`
@@ -158,9 +148,7 @@ const Navbar = () => {
                             </nav>
                         </div>
 
-                        {/* Right Section: Actions */}
                         <div className="flex items-center gap-2 sm:gap-3">
-                            {/* Available Coins - Logged In Only */}
                             {isLoggedIn && (
                                 <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-linear-to-r from-accent/10 to-warning/10 border border-accent/20 rounded-lg hover:border-accent/40 transition-all cursor-pointer group">
                                     <div className="relative">
@@ -169,12 +157,11 @@ const Navbar = () => {
                                     </div>
                                     <div className="flex flex-col leading-none">
                                         <span className="text-xs text-base-content/60 font-medium">Balance</span>
-                                        <span className="text-sm font-bold text-accent">{user.coins.toLocaleString()}</span>
+                                        <span className="text-sm font-bold text-accent">{user?.coin || 0}</span>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Theme Toggle */}
                             <button
                                 onClick={toggleTheme}
                                 className="btn btn-square btn-ghost transition-all duration-300"
@@ -192,7 +179,6 @@ const Navbar = () => {
                                 </div>
                             </button>
 
-                            {/* GitHub Link */}
                             <a
                                 href={githubRepoUrl}
                                 target="_blank"
@@ -203,7 +189,6 @@ const Navbar = () => {
                                 <Github className="size-5" />
                             </a>
 
-                            {/* Notifications - Logged In Only */}
                             {isLoggedIn && (
                                 <div className="notification-dropdown relative">
                                     <button
@@ -212,6 +197,7 @@ const Navbar = () => {
                                             setNotificationOpen(!notificationOpen)
                                         }}
                                         className="btn btn-square btn-ghost relative"
+                                        aria-label="Notifications"
                                     >
                                         <Bell className="size-5 text-base-content" />
                                         {unreadCount > 0 && (
@@ -251,7 +237,6 @@ const Navbar = () => {
                                 </div>
                             )}
 
-                            {/* Auth Buttons - Not Logged In (Desktop) */}
                             {!isLoggedIn && (
                                 <div className="hidden lg:flex items-center gap-2">
                                     <NavLink to="/login" className="btn btn-ghost">
@@ -263,22 +248,25 @@ const Navbar = () => {
                                 </div>
                             )}
 
-                            {/* User Profile Dropdown - Logged In (Desktop) */}
-                            {isLoggedIn && (
+                            {isLoggedIn && user && (
                                 <div className="hidden lg:block dropdown dropdown-end">
                                     <button
                                         tabIndex={0}
                                         className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-200 transition-all duration-200 group"
+                                        aria-label="User menu"
                                     >
                                         <div className="flex flex-col items-end leading-none">
                                             <span className="text-sm font-semibold text-base-content group-hover:text-primary transition-colors">
-                                                {user.name}
+                                                {user.displayName || 'User'}
                                             </span>
-                                            <span className="text-xs text-base-content/60 capitalize">{user.role}</span>
+                                            <span className="text-xs text-base-content/60 capitalize">{role || 'user'}</span>
                                         </div>
                                         <div className="avatar">
                                             <div className="w-10 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100 group-hover:ring-accent transition-all">
-                                                <img src={user.image} alt={user.name} />
+                                                <img
+                                                    src={user.photoURL || 'https://via.placeholder.com/150'}
+                                                    alt={user.displayName || 'User'}
+                                                />
                                             </div>
                                         </div>
                                     </button>
@@ -290,13 +278,16 @@ const Navbar = () => {
                                             <div className="flex items-center gap-3">
                                                 <div className="avatar">
                                                     <div className="w-12 rounded-full ring-2 ring-primary">
-                                                        <img src={user.image} alt={user.name} />
+                                                        <img
+                                                            src={user.photoURL || 'https://via.placeholder.com/150'}
+                                                            alt={user.displayName || 'User'}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-base text-base-content">{user.name}</span>
+                                                    <span className="font-bold text-base text-base-content">{user.displayName || 'User'}</span>
                                                     <span className="text-xs text-base-content/60">{user.email}</span>
-                                                    <div className="badge badge-primary badge-sm mt-1 capitalize">{user.role}</div>
+                                                    <div className="badge badge-primary badge-sm mt-1 capitalize">{role || 'user'}</div>
                                                 </div>
                                             </div>
                                         </li>
@@ -306,13 +297,13 @@ const Navbar = () => {
                                                 to="/profile"
                                                 className="flex items-center gap-2 hover:bg-primary/10"
                                             >
-                                                <User className="size-4" />
+                                                <UserIcon className="size-4" />
                                                 <span>My Profile</span>
                                             </NavLink>
                                         </li>
                                         <div className="divider my-1"></div>
                                         <li>
-                                            <button onClick={logout} className="flex items-center gap-2 text-error hover:bg-error/10">
+                                            <button onClick={handleLogout} className="flex items-center gap-2 text-error hover:bg-error/10">
                                                 <LogOut className="size-4" />
                                                 <span>Logout</span>
                                             </button>
@@ -321,7 +312,6 @@ const Navbar = () => {
                                 </div>
                             )}
 
-                            {/* Mobile Menu Toggle */}
                             <button
                                 onClick={toggleMenu}
                                 className="lg:hidden btn btn-square btn-ghost"
@@ -342,38 +332,38 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                {/* Mobile Menu */}
                 <div
                     className={`lg:hidden border-t border-base-300 bg-base-100 transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
                         }`}
                 >
                     <div className="container mx-auto px-4 py-6 space-y-4">
-                        {/* Mobile User Info - Logged In */}
-                        {isLoggedIn && (
+                        {isLoggedIn && user && (
                             <div className="bg-linear-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-4">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="avatar">
                                         <div className="w-14 rounded-full ring-2 ring-primary">
-                                            <img src={user.image} alt={user.name} />
+                                            <img
+                                                src={user.photoURL || 'https://via.placeholder.com/150'}
+                                                alt={user.displayName || 'User'}
+                                            />
                                         </div>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="font-bold text-base">{user.name}</span>
+                                        <span className="font-bold text-base">{user.displayName || 'User'}</span>
                                         <span className="text-xs text-base-content/60">{user.email}</span>
-                                        <div className="badge badge-primary badge-sm mt-1 capitalize">{user.role}</div>
+                                        <div className="badge badge-primary badge-sm mt-1 capitalize">{role || 'user'}</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 px-3 py-2 bg-base-100 rounded-lg">
                                     <Coins className="size-5 text-accent" />
                                     <div className="flex flex-col leading-none">
                                         <span className="text-xs text-base-content/60">Available Coins</span>
-                                        <span className="text-sm font-bold text-accent">{user.coins.toLocaleString()}</span>
+                                        <span className="text-sm font-bold text-accent">{user?.coin || 0}</span>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Mobile Navigation */}
                         <nav className="space-y-1">
                             {currentLinks.map((link) => {
                                 const Icon = link.icon
@@ -396,7 +386,6 @@ const Navbar = () => {
                             })}
                         </nav>
 
-                        {/* Mobile Auth Buttons - Not Logged In */}
                         {!isLoggedIn && (
                             <>
                                 <div className="divider my-2"></div>
@@ -409,24 +398,22 @@ const Navbar = () => {
                             </>
                         )}
 
-                        {/* Mobile Profile & Logout - Logged In */}
                         {isLoggedIn && (
                             <>
                                 <div className="divider my-2"></div>
                                 <NavLink to="/profile" onClick={closeMenu} className="block">
                                     <button className="btn btn-ghost w-full justify-start gap-2">
-                                        <User className="size-5" />
+                                        <UserIcon className="size-5" />
                                         My Profile
                                     </button>
                                 </NavLink>
-                                <button onClick={() => { logout(); closeMenu(); }} className="btn btn-error btn-outline w-full justify-start gap-2">
+                                <button onClick={handleLogout} className="btn btn-error btn-outline w-full justify-start gap-2">
                                     <LogOut className="size-5" />
                                     Logout
                                 </button>
                             </>
                         )}
 
-                        {/* Developer Link */}
                         <div className="pt-4 border-t border-base-300">
                             <a
                                 href={githubRepoUrl}
@@ -442,7 +429,6 @@ const Navbar = () => {
                     </div>
                 </div>
             </header>
-            {/* Spacer to prevent content from hiding under fixed navbar */}
             <div className="h-16"></div>
         </>
     )

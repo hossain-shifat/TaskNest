@@ -8,6 +8,8 @@ import Help from "../pages/Help/Help";
 import AuthLayout from "../layout/AuthLayout";
 import Login from "../pages/Auth/Login/Login";
 import Register from "../pages/Auth/Register/Register";
+import PrivateRoute from "./PrivetRoute";
+import Profile from "../pages/Profile/Profile";
 
 
 export const router = createBrowserRouter([
@@ -34,6 +36,10 @@ export const router = createBrowserRouter([
             {
                 path: '/help',
                 Component: Help
+            },
+            {
+                path: '/profile',
+                element: <PrivateRoute><Profile /></PrivateRoute>
             },
         ]
     },

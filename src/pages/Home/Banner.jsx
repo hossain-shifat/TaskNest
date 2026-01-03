@@ -244,7 +244,7 @@ const Banner = () => {
             <Slider
                 slides={slides}
                 autoPlay={true}
-                autoPlayInterval={7000}
+                autoPlayInterval={2000}
                 renderSlide={renderSlide}
                 onSlideChange={animateSlide}
             />
