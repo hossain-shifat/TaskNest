@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { NavLink } from 'react-router'
-import { Moon, Sun, Menu, X, Github, Coins, LogOut, LayoutDashboard, Bell, Home, User, ListTodo, Plus, Wallet, History, Users, Settings, Info, PhoneCall } from 'lucide-react'
+import { Moon, Sun, Menu, X, Github, Coins, LogOut, LayoutDashboard, Bell, Home, User, ListTodo, Plus, Wallet, History, Users, Settings, Info, PhoneCall, HeartHandshake } from 'lucide-react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 
@@ -87,6 +87,7 @@ const Navbar = () => {
             { to: '/', label: 'Home', icon: Home },
             { to: '/about', label: 'About', icon: Info },
             { to: '/contact', label: 'Contact', icon: PhoneCall },
+            { to: '/terms/privacy', label: 'Privacy & Policy', icon: HeartHandshake },
         ],
         worker: [
             { to: '/', label: 'Home', icon: Home },

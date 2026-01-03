@@ -3,6 +3,7 @@ import Root from "../layout/Root";
 import Home from "../pages/Home/Home";
 import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
+import Terms from "../pages/PrivacyPolicy/Terms";
 
 
 export const router = createBrowserRouter([
@@ -21,6 +22,10 @@ export const router = createBrowserRouter([
             {
                 path: '/contact',
                 Component: Contact
+            },
+            {
+                path: '/terms/privacy',
+                Component: Terms
             },
         ]
     }
