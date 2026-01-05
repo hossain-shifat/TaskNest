@@ -81,7 +81,7 @@ const NotificationDropdown = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-80 md:w-96 bg-base-100 rounded-lg shadow-lg border border-base-300 z-50 max-h-[500px] overflow-hidden flex flex-col"
+                        className="absolute right-0 mt-2 w-80 md:w-96 bg-base-100 rounded-lg shadow-lg border border-base-300 z-50 max-h-125 overflow-hidden flex flex-col"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between p-4 border-b border-base-300">

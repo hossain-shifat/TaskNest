@@ -237,3 +237,43 @@
 [data-theme="dark"] .nav-active {
   box-shadow: var(--glow-accent);
 }
+
+/* ===== TOC SAFE ANIMATION (NO TRANSFORM ON STICKY) ===== */
+.toc-container {
+  opacity: 0;
+  animation: tocFadeIn 0.8s ease-out forwards;
+}
+
+.toc-item {
+  opacity: 0;
+  animation: tocItemFade 0.5s ease-out forwards;
+}
+
+.toc-item:nth-child(1) { animation-delay: 0.1s; }
+.toc-item:nth-child(2) { animation-delay: 0.15s; }
+.toc-item:nth-child(3) { animation-delay: 0.2s; }
+.toc-item:nth-child(4) { animation-delay: 0.25s; }
+.toc-item:nth-child(5) { animation-delay: 0.3s; }
+.toc-item:nth-child(6) { animation-delay: 0.35s; }
+.toc-item:nth-child(7) { animation-delay: 0.4s; }
+.toc-item:nth-child(8) { animation-delay: 0.45s; }
+
+@keyframes tocFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tocItemFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

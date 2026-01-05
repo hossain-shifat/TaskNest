@@ -270,7 +270,7 @@ const Terms = () => {
                 <div className="max-w-7xl mx-auto">
                     <div className="grid lg:grid-cols-4 gap-12">
                         {/* Table of Contents - Sticky Sidebar */}
-                        <div ref={tocRef} className="lg:col-span-1">
+                        <div className="lg:col-span-1">
                             <div className="toc-container lg:sticky lg:top-8">
                                 <div className="bg-base-200 rounded-2xl p-6 border border-base-300 shadow-lg">
                                     <h3 className="text-lg font-bold text-base-content mb-4 flex items-center gap-2">

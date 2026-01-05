@@ -18,7 +18,7 @@ const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const axiosSecure = useAxiosSecure()
 
-    const githubRepoUrl = "https://github.com/yourusername/micro-task-platform"
+    const githubRepoUrl = "https://github.com/hossain-shifat/TaskNest"
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
     const closeMenu = () => setIsMenuOpen(false)
