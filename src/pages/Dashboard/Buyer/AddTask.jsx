@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import useAxiosSecure from '../../../hooks/UseAxiosSecure'
 import useAuth from '../../../hooks/useAuth'
+import { AlertCircle, Plus } from 'lucide-react'
 import gsap from 'gsap'
 import Swal from 'sweetalert2'
 
@@ -19,14 +20,14 @@ const AddTask = () => {
     const payableAmount = watch('payable_amount', 0)
     const totalCost = requiredWorkers * payableAmount
 
-    // useEffect(() => {
-    //     gsap.from(formRef.current, {
-    //         y: 50,
-    //         opacity: 0,
-    //         duration: 0.6,
-    //         ease: 'power3.out'
-    //     })
-    // }, [])
+    useEffect(() => {
+        gsap.from(formRef.current, {
+            y: 30,
+            opacity: 0,
+            duration: 0.5,
+            ease: 'power2.out'
+        })
+    }, [])
 
     const onSubmit = async (data) => {
         try {
@@ -70,151 +71,179 @@ const AddTask = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
-            {/* Page Header */}
+        <div className="max-w-3xl mx-auto space-y-6">
+            {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold mb-2">Add New Task</h1>
-                <p className="text-base-content/60">Create a new task for workers to complete</p>
+                <h1 className="text-3xl font-bold mb-1">Add New Task</h1>
+                <p className="text-base-content/60 text-sm">Create a task for workers to complete</p>
             </div>
 
-            {/* Form Card */}
-            <div ref={formRef} className="bg-base-200 rounded-lg p-6 shadow-md">
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Form */}
+            <div ref={formRef} className="bg-base-200 rounded-xl p-6 shadow-sm">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     {/* Task Title */}
-                    <div>
-                        <label className="label">
-                            <span className="label-text font-semibold">Task Title</span>
+                    <div className="form-control">
+                        <label className="label pb-1">
+                            <span className="label-text text-sm font-medium">Task Title *</span>
                         </label>
                         <input
                             {...register('task_title', { required: 'Task title is required' })}
                             type="text"
-                            className="input input-bordered w-full"
-                            placeholder="e.g., Watch my YouTube video and make a comment"
+                            className="input input-sm input-bordered w-full"
+                            placeholder="e.g., Watch my YouTube video and comment"
                         />
                         {errors.task_title && (
-                            <span className="text-error text-sm mt-1">{errors.task_title.message}</span>
+                            <label className="label pt-1">
+                                <span className="label-text-alt text-error text-xs">{errors.task_title.message}</span>
+                            </label>
                         )}
                     </div>
 
                     {/* Task Detail */}
-                    <div>
-                        <label className="label">
-                            <span className="label-text font-semibold">Task Detail</span>
+                    <div className="form-control">
+                        <label className="label pb-1">
+                            <span className="label-text text-sm font-medium">Task Description *</span>
                         </label>
                         <textarea
                             {...register('task_detail', { required: 'Task detail is required' })}
-                            className="textarea textarea-bordered w-full h-32"
-                            placeholder="Provide detailed description of the task"
+                            className="textarea textarea-sm textarea-bordered w-full h-24 resize-none"
+                            placeholder="Describe what workers need to do..."
                         />
                         {errors.task_detail && (
-                            <span className="text-error text-sm mt-1">{errors.task_detail.message}</span>
+                            <label className="label pt-1">
+                                <span className="label-text-alt text-error text-xs">{errors.task_detail.message}</span>
+                            </label>
                         )}
                     </div>
 
-                    {/* Grid Layout for Numbers */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Required Workers */}
-                        <div>
-                            <label className="label">
-                                <span className="label-text font-semibold">Required Workers</span>
+                    {/* Workers & Payment Row */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="form-control">
+                            <label className="label pb-1">
+                                <span className="label-text text-sm font-medium">Workers Needed *</span>
                             </label>
                             <input
                                 {...register('required_workers', {
-                                    required: 'Number of workers is required',
-                                    min: { value: 1, message: 'At least 1 worker required' }
+                                    required: 'Required',
+                                    min: { value: 1, message: 'Min 1 worker' }
                                 })}
                                 type="number"
-                                className="input input-bordered w-full"
-                                placeholder="e.g., 100"
+                                className="input input-sm input-bordered w-full"
+                                placeholder="100"
                                 min="1"
                             />
                             {errors.required_workers && (
-                                <span className="text-error text-sm mt-1">{errors.required_workers.message}</span>
+                                <label className="label pt-1">
+                                    <span className="label-text-alt text-error text-xs">{errors.required_workers.message}</span>
+                                </label>
                             )}
                         </div>
 
-                        {/* Payable Amount */}
-                        <div>
-                            <label className="label">
-                                <span className="label-text font-semibold">Payable Amount (coins)</span>
+                        <div className="form-control">
+                            <label className="label pb-1">
+                                <span className="label-text text-sm font-medium">Payment (coins) *</span>
                             </label>
                             <input
                                 {...register('payable_amount', {
-                                    required: 'Payable amount is required',
-                                    min: { value: 1, message: 'Amount must be at least 1 coin' }
+                                    required: 'Required',
+                                    min: { value: 1, message: 'Min 1 coin' }
                                 })}
                                 type="number"
-                                className="input input-bordered w-full"
-                                placeholder="e.g., 10"
+                                className="input input-sm input-bordered w-full"
+                                placeholder="10"
                                 min="1"
                             />
                             {errors.payable_amount && (
-                                <span className="text-error text-sm mt-1">{errors.payable_amount.message}</span>
+                                <label className="label pt-1">
+                                    <span className="label-text-alt text-error text-xs">{errors.payable_amount.message}</span>
+                                </label>
                             )}
                         </div>
                     </div>
 
-                    {/* Total Cost Display */}
+                    {/* Total Cost */}
                     {totalCost > 0 && (
-                        <div className="alert alert-info">
-                            <span className="font-semibold">
-                                Total Cost: {totalCost} coins ({requiredWorkers} workers × {payableAmount} coins)
+                        <div className="alert alert-warning py-2 px-3">
+                            <AlertCircle size={18} />
+                            <span className="text-sm">
+                                Total: <strong>{totalCost} coins</strong> ({requiredWorkers} × {payableAmount})
                             </span>
                         </div>
                     )}
 
                     {/* Completion Date */}
-                    <div>
-                        <label className="label">
-                            <span className="label-text font-semibold">Completion Date</span>
+                    <div className="form-control">
+                        <label className="label pb-1">
+                            <span className="label-text text-sm font-medium">Deadline *</span>
                         </label>
                         <input
-                            {...register('completion_date', { required: 'Completion date is required' })}
+                            {...register('completion_date', { required: 'Deadline is required' })}
                             type="date"
-                            className="input input-bordered w-full"
+                            className="input input-sm input-bordered w-full"
                             min={new Date().toISOString().split('T')[0]}
                         />
                         {errors.completion_date && (
-                            <span className="text-error text-sm mt-1">{errors.completion_date.message}</span>
+                            <label className="label pt-1">
+                                <span className="label-text-alt text-error text-xs">{errors.completion_date.message}</span>
+                            </label>
                         )}
                     </div>
 
                     {/* Submission Info */}
-                    <div>
-                        <label className="label">
-                            <span className="label-text font-semibold">Submission Info</span>
+                    <div className="form-control">
+                        <label className="label pb-1">
+                            <span className="label-text text-sm font-medium">Submission Requirements *</span>
                         </label>
                         <textarea
                             {...register('submission_info', { required: 'Submission info is required' })}
-                            className="textarea textarea-bordered w-full h-24"
-                            placeholder="What should workers submit? (e.g., screenshot, proof of completion)"
+                            className="textarea textarea-sm textarea-bordered w-full h-20 resize-none"
+                            placeholder="What should workers submit? (screenshot, link, etc.)"
                         />
                         {errors.submission_info && (
-                            <span className="text-error text-sm mt-1">{errors.submission_info.message}</span>
+                            <label className="label pt-1">
+                                <span className="label-text-alt text-error text-xs">{errors.submission_info.message}</span>
+                            </label>
                         )}
                     </div>
 
                     {/* Task Image URL */}
-                    <div>
-                        <label className="label">
-                            <span className="label-text font-semibold">Task Image URL</span>
+                    <div className="form-control">
+                        <label className="label pb-1">
+                            <span className="label-text text-sm font-medium">Task Image URL *</span>
                         </label>
                         <input
-                            {...register('task_image_url', { required: 'Task image URL is required' })}
+                            {...register('task_image_url', { required: 'Image URL is required' })}
                             type="url"
-                            className="input input-bordered w-full"
+                            className="input input-sm input-bordered w-full"
                             placeholder="https://example.com/image.jpg"
                         />
                         {errors.task_image_url && (
-                            <span className="text-error text-sm mt-1">{errors.task_image_url.message}</span>
+                            <label className="label pt-1">
+                                <span className="label-text-alt text-error text-xs">{errors.task_image_url.message}</span>
+                            </label>
                         )}
                     </div>
 
+                    {/* Divider */}
+                    <div className="divider my-4"></div>
+
                     {/* Submit Button */}
-                    <button type="submit" className="btn btn-primary w-full">
-                        Add Task
+                    <button
+                        type="submit"
+                        className="btn btn-primary btn-sm w-full gap-2"
+                    >
+                        <Plus size={18} />
+                        Create Task
                     </button>
                 </form>
+            </div>
+
+            {/* Quick Tips */}
+            <div className="text-xs text-base-content/60 bg-base-200 rounded-lg p-3 space-y-1">
+                <p className="font-semibold text-base-content mb-2">Tips:</p>
+                <p>• Be specific in your task description to get better results</p>
+                <p>• Set realistic deadlines for task completion</p>
+                <p>• Clearly state what proof of completion you need</p>
             </div>
         </div>
     )

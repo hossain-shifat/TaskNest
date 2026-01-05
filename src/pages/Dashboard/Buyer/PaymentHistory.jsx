@@ -19,16 +19,16 @@ const PaymentHistory = () => {
         enabled: !!user?.email
     })
 
-    useEffect(() => {
-        if (payments.length > 0 && !isLoading) {
-            gsap.from(tableRef.current, {
-                y: 30,
-                opacity: 0,
-                duration: 0.6,
-                ease: 'power3.out'
-            })
-        }
-    }, [payments, isLoading])
+    // useEffect(() => {
+    //     if (payments.length > 0 && !isLoading) {
+    //         gsap.from(tableRef.current, {
+    //             y: 30,
+    //             opacity: 0,
+    //             duration: 0.6,
+    //             ease: 'power3.out'
+    //         })
+    //     }
+    // }, [payments, isLoading])
 
     if (isLoading) {
         return (
