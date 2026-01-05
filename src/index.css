@@ -216,3 +216,24 @@
   border-radius: 0.75rem; /* matches p-3 shape */
   box-shadow: var(--glow-accent);
 }
+
+
+.nav-active {
+  @apply relative font-semibold text-accent bg-accent/10;
+  border-radius: 0.75rem;
+}
+
+.nav-active::before {
+  content: "";
+  position: absolute;
+  right: 0.50rem;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 4px;
+  border-radius: 999px;
+  background: oklch(77% 0.152 181.912);
+}
+
+[data-theme="dark"] .nav-active {
+  box-shadow: var(--glow-accent);
+}

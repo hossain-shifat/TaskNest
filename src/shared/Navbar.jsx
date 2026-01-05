@@ -7,15 +7,7 @@ import useAuth from '../hooks/useAuth'
 import useRole from '../hooks/useRole'
 import { useQuery } from '@tanstack/react-query'
 import useAxiosSecure from '../hooks/UseAxiosSecure'
-
-const useTheme = () => {
-    const [theme, setTheme] = useState('dark')
-    const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
-    useEffect(() => {
-        document.documentElement.setAttribute('data-theme', theme)
-    }, [theme])
-    return { theme, toggleTheme }
-}
+import { useTheme } from '../hooks/useTheme'
 
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme()
@@ -88,23 +80,23 @@ const Navbar = () => {
         worker: [
             // { to: '/', label: 'Home', icon: Home },
             { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            { to: '/dashboard/task-list', label: 'Task List', icon: ListTodo },
-            { to: '/dashboard/my-submissions', label: 'My Submissions', icon: History },
-            { to: '/dashboard/withdrawals', label: 'Withdrawals', icon: Wallet }
+            // { to: '/dashboard/task-list', label: 'Task List', icon: ListTodo },
+            // { to: '/dashboard/my-submissions', label: 'My Submissions', icon: History },
+            // { to: '/dashboard/withdrawals', label: 'Withdrawals', icon: Wallet }
         ],
         buyer: [
             // { to: '/', label: 'Home', icon: Home },
             { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            { to: '/dashboard/add-task', label: 'Add New Task', icon: Plus },
-            { to: '/dashboard/my-tasks', label: 'My Tasks', icon: ListTodo },
-            { to: '/dashboard/purchase-coin', label: 'Purchase Coin', icon: Coins },
-            { to: '/dashboard/payment-history', label: 'Payment History', icon: History }
+            // { to: '/dashboard/add-task', label: 'Add New Task', icon: Plus },
+            // { to: '/dashboard/my-tasks', label: 'My Tasks', icon: ListTodo },
+            // { to: '/dashboard/purchase-coin', label: 'Purchase Coin', icon: Coins },
+            // { to: '/dashboard/payment-history', label: 'Payment History', icon: History }
         ],
         admin: [
             // { to: '/', label: 'Home', icon: Home },
             { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            { to: '/dashboard/manage-users', label: 'Manage Users', icon: Users },
-            { to: '/dashboard/manage-tasks', label: 'Manage Tasks', icon: Settings }
+            // { to: '/dashboard/manage-users', label: 'Manage Users', icon: Users },
+            // { to: '/dashboard/manage-tasks', label: 'Manage Tasks', icon: Settings }
         ]
     }
 
@@ -125,6 +117,7 @@ const Navbar = () => {
         }
     });
 
+
     return (
         <>
             <header
@@ -132,7 +125,7 @@ const Navbar = () => {
             >
                 <div className="container mx-auto">
                     <div className="flex h-16 items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-10">
                             <div>
                                 <Logo closeMenu={closeMenu} />
                             </div>
@@ -145,7 +138,7 @@ const Navbar = () => {
                                             key={link.to}
                                             to={link.to}
                                             className={({ isActive }) =>
-                                                `flex items-center gap-2 px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
+                                                `flex items-center gap-2 px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-base-content ${isActive
                                                     ? 'active text-accent bg-accent/10'
                                                     : 'text-base-content hover:text-accent hover:bg-base-200/70'
                                                 }`
