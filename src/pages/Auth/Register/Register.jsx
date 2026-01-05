@@ -2,10 +2,11 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import gsap from 'gsap';
-import { Eye, EyeOff } from 'lucide-react';
-import useAxiosSecure from '../../../hooks/UseAxiosSecure';
+import { Eye, EyeOff, Upload, X } from 'lucide-react';
+import axios from 'axios';
 import { AuthContext } from '../../../context/Auth/AuthCOntext';
 import SocialLogin from '../../../components/SocialLogin';
+import useAxiosSecure from '../../../hooks/useAxiosSecure';
 
 
 /**
@@ -20,12 +21,16 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [authError, setAuthError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [uploadedImageUrl, setUploadedImageUrl] = useState('');
     const axiosSecure = useAxiosSecure();
 
     const formRef = useRef(null);
     const errorRef = useRef(null);
+    const fileInputRef = useRef(null);
 
-    const { register, handleSubmit, watch, formState: { errors } } = useForm({
+    const { register, handleSubmit, watch, formState: { errors }, setValue } = useForm({
         mode: 'onBlur'
     });
 
@@ -76,7 +81,76 @@ const Register = () => {
 
     const passwordStrength = getPasswordStrength(password);
 
+    // Handle image upload to imgBB
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            setAuthError('Please select a valid image file');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            setAuthError('Image size must be less than 5MB');
+            return;
+        }
+
+        setUploadingImage(true);
+        setAuthError('');
+
+        try {
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+
+            // Upload to imgBB
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const response = await axios.post(
+                `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMG_HOST}`,
+                formData
+            );
+
+            if (response.data.success) {
+                const imageUrl = response.data.data.display_url;
+                setUploadedImageUrl(imageUrl);
+                setValue('photoURL', imageUrl);
+            } else {
+                throw new Error('Upload failed');
+            }
+        } catch (error) {
+            console.error('Image upload error:', error);
+            setAuthError('Failed to upload image. Please try again.');
+            setImagePreview(null);
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
+    // Remove uploaded image
+    const handleRemoveImage = () => {
+        setImagePreview(null);
+        setUploadedImageUrl('');
+        setValue('photoURL', '');
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
     const onSubmit = async (data) => {
+        // Validate image is uploaded
+        if (!uploadedImageUrl) {
+            setAuthError('Please upload a profile picture');
+            return;
+        }
+
         setLoading(true);
         setAuthError('');
 
@@ -88,7 +162,7 @@ const Register = () => {
             // 2. Update Firebase user profile with name and photo BEFORE backend call
             await updateUserProfile({
                 displayName: data.name,
-                photoURL: data.photoURL || ''
+                photoURL: uploadedImageUrl
             });
 
             // 3. Get fresh token after profile update
@@ -102,7 +176,7 @@ const Register = () => {
                 email: data.email,
                 displayName: data.name,
                 role: data.role,
-                photoURL: data.photoURL || ''
+                photoURL: uploadedImageUrl
             });
 
             // 6. Success animation before redirect
@@ -203,29 +277,6 @@ const Register = () => {
                     )}
                 </div>
 
-                {/* Profile Picture URL */}
-                <div className="form-field form-control">
-                    <label className="label">
-                        <span className="label-text font-medium">Profile Picture URL (Optional)</span>
-                    </label>
-                    <input
-                        type="url"
-                        placeholder="https://example.com/photo.jpg"
-                        className={`input input-bordered w-full ${errors.photoURL ? 'input-error' : ''}`}
-                        {...register('photoURL', {
-                            pattern: {
-                                value: /^https?:\/\/.+/i,
-                                message: 'Must be a valid URL'
-                            }
-                        })}
-                    />
-                    {errors.photoURL && (
-                        <label className="label">
-                            <span className="label-text-alt text-error">{errors.photoURL.message}</span>
-                        </label>
-                    )}
-                </div>
-
                 {/* Password with Toggle */}
                 <div className="form-field form-control">
                     <label className="label">
@@ -310,12 +361,79 @@ const Register = () => {
                     </label>
                 </div>
 
+                {/* Profile Picture Upload */}
+                <div className="form-field form-control">
+                    <label className="label">
+                        <span className="label-text font-medium">Profile Picture *</span>
+                    </label>
+
+                    {!imagePreview ? (
+                        <div className="relative">
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
+                                id="profile-upload"
+                            />
+                            <label
+                                htmlFor="profile-upload"
+                                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-base-300 rounded-lg cursor-pointer hover:border-primary transition-colors bg-base-200"
+                            >
+                                <Upload className="w-8 h-8 text-base-content/40 mb-2" />
+                                <span className="text-sm text-base-content/60">
+                                    {uploadingImage ? 'Uploading...' : 'Click to upload profile picture'}
+                                </span>
+                                <span className="text-xs text-base-content/40 mt-1">
+                                    PNG, JPG up to 5MB
+                                </span>
+                            </label>
+                        </div>
+                    ) : (
+                        <div className="relative w-full h-32 border-2 border-base-300 rounded-lg overflow-hidden">
+                            <img
+                                src={imagePreview}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleRemoveImage}
+                                className="absolute top-2 right-2 btn btn-circle btn-sm btn-error"
+                                disabled={uploadingImage}
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                    )}
+
+                    {uploadingImage && (
+                        <div className="mt-2">
+                            <progress className="progress progress-primary w-full"></progress>
+                        </div>
+                    )}
+
+                    {/* Hidden input for form validation */}
+                    <input
+                        type="hidden"
+                        {...register('photoURL', {
+                            required: 'Profile picture is required'
+                        })}
+                    />
+                    {errors.photoURL && !uploadedImageUrl && (
+                        <label className="label">
+                            <span className="label-text-alt text-error">{errors.photoURL.message}</span>
+                        </label>
+                    )}
+                </div>
+
                 {/* Submit Button */}
                 <div className="submit-btn">
                     <button
                         type="submit"
                         className="btn btn-primary w-full"
-                        disabled={loading}
+                        disabled={loading || uploadingImage}
                     >
                         {loading ? (
                             <>

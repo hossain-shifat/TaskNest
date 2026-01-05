@@ -1,45 +1,22 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { NavLink } from 'react-router'
-import { Moon, Sun, Menu, X, Github, Coins, LogOut, LayoutDashboard, Bell, Home, ListTodo, Plus, Wallet, History, Users, Settings, Info, PhoneCall, HeartHandshake, HelpCircle, UserIcon } from 'lucide-react'
+import { Moon, Sun, Menu, X, Github, Coins, LogOut, LayoutDashboard, Home, Info, PhoneCall, HeartHandshake, HelpCircle, UserIcon, Briefcase, Shield } from 'lucide-react'
 import Logo from '../components/Logo'
+import NotificationDropdown from '../components/NotificationDropdown'
 import { AuthContext } from '../context/Auth/AuthCOntext'
 import useAuth from '../hooks/useAuth'
 import useRole from '../hooks/useRole'
 import { useQuery } from '@tanstack/react-query'
-import useAxiosSecure from '../hooks/UseAxiosSecure'
 import { useTheme } from '../hooks/useTheme'
+import useAxiosSecure from '../hooks/useAxiosSecure'
 
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme()
-    const { loading, logOut } = useContext(AuthContext)
+    const { logOut } = useContext(AuthContext)
     const { user } = useAuth()
-    const { role, roleLoading } = useRole()
+    const { role } = useRole()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [notificationOpen, setNotificationOpen] = useState(false)
     const axiosSecure = useAxiosSecure()
-    const [notifications] = useState([
-        {
-            id: 1,
-            title: "Task Approved!",
-            message: "You earned 50 coins from completing 'YouTube Video Comment'",
-            time: "2 minutes ago",
-            read: false
-        },
-        {
-            id: 2,
-            title: "New Task Available",
-            message: "Check out the latest tasks in your dashboard",
-            time: "1 hour ago",
-            read: false
-        },
-        {
-            id: 3,
-            title: "Withdrawal Processed",
-            message: "Your withdrawal of $25 has been approved",
-            time: "3 hours ago",
-            read: true
-        }
-    ])
 
     const githubRepoUrl = "https://github.com/yourusername/micro-task-platform"
 
@@ -57,46 +34,34 @@ const Navbar = () => {
         }
     }
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (notificationOpen && !event.target.closest('.notification-dropdown')) {
-                setNotificationOpen(false)
-            }
-        }
-        document.addEventListener('click', handleClickOutside)
-        return () => document.removeEventListener('click', handleClickOutside)
-    }, [notificationOpen])
-
-    const unreadCount = notifications.filter(n => !n.read).length
-
     const navigationLinks = {
         public: [
             { to: '/', label: 'Home', icon: Home },
             { to: '/about', label: 'About', icon: Info },
             { to: '/contact', label: 'Contact', icon: PhoneCall },
-            { to: '/terms/privacy', label: 'Privacy & Policy', icon: HeartHandshake },
             { to: '/help', label: 'Help', icon: HelpCircle },
+            { to: '/terms/privacy', label: 'Privacy', icon: HeartHandshake },
         ],
         worker: [
-            // { to: '/', label: 'Home', icon: Home },
             { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            // { to: '/dashboard/task-list', label: 'Task List', icon: ListTodo },
-            // { to: '/dashboard/my-submissions', label: 'My Submissions', icon: History },
-            // { to: '/dashboard/withdrawals', label: 'Withdrawals', icon: Wallet }
+            { to: '/about', label: 'About', icon: Info },
+            { to: '/contact', label: 'Contact', icon: PhoneCall },
+            { to: '/help', label: 'Help', icon: HelpCircle },
+            { to: '/terms/privacy', label: 'Privacy', icon: Shield },
         ],
         buyer: [
-            // { to: '/', label: 'Home', icon: Home },
             { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            // { to: '/dashboard/add-task', label: 'Add New Task', icon: Plus },
-            // { to: '/dashboard/my-tasks', label: 'My Tasks', icon: ListTodo },
-            // { to: '/dashboard/purchase-coin', label: 'Purchase Coin', icon: Coins },
-            // { to: '/dashboard/payment-history', label: 'Payment History', icon: History }
+            { to: '/about', label: 'About', icon: Info },
+            { to: '/contact', label: 'Contact', icon: PhoneCall },
+            { to: '/help', label: 'Help', icon: HelpCircle },
+            { to: '/terms/privacy', label: 'Privacy', icon: Shield },
         ],
         admin: [
-            // { to: '/', label: 'Home', icon: Home },
             { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            // { to: '/dashboard/manage-users', label: 'Manage Users', icon: Users },
-            // { to: '/dashboard/manage-tasks', label: 'Manage Tasks', icon: Settings }
+            { to: '/about', label: 'About', icon: Info },
+            { to: '/contact', label: 'Contact', icon: PhoneCall },
+            { to: '/help', label: 'Help', icon: HelpCircle },
+            { to: '/terms/privacy', label: 'Privacy', icon: Shield },
         ]
     }
 
@@ -108,23 +73,21 @@ const Navbar = () => {
 
     const currentLinks = getCurrentLinks()
 
-    const { data: loggedInUser, isLoading, error, refetch } = useQuery({
+    const { data: loggedInUser } = useQuery({
         queryKey: ['loggedInUser', user?.email],
         enabled: !!user?.email,
         queryFn: async () => {
-            const res = await axiosSecure.get(`/users/${user.email}`);
-            return res.data;
+            const res = await axiosSecure.get(`/users/${user.email}`)
+            return res.data
         }
-    });
-
+    })
 
     return (
         <>
-            <header
-                className="fixed top-0 left-0 right-0 z-50 w-full border-b border-base-300 bg-base-100/95  shadow-md"
-            >
+            <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-base-300 bg-base-100/95 backdrop-blur-md shadow-md">
                 <div className="container mx-auto">
                     <div className="flex h-16 items-center justify-between gap-4">
+                        {/* Left Section - Logo & Navigation */}
                         <div className="flex items-center gap-10">
                             <div>
                                 <Logo closeMenu={closeMenu} />
@@ -138,7 +101,7 @@ const Navbar = () => {
                                             key={link.to}
                                             to={link.to}
                                             className={({ isActive }) =>
-                                                `flex items-center gap-2 px-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-base-content ${isActive
+                                                `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
                                                     ? 'active text-accent bg-accent/10'
                                                     : 'text-base-content hover:text-accent hover:bg-base-200/70'
                                                 }`
@@ -152,9 +115,11 @@ const Navbar = () => {
                             </nav>
                         </div>
 
+                        {/* Right Section - Actions */}
                         <div className="flex items-center gap-2 sm:gap-3">
+                            {/* Coin Balance - Desktop */}
                             {isLoggedIn && (
-                                <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-linear-to-r from-accent/10 to-warning/10 border border-accent/20 rounded-lg hover:border-accent/40 transition-all cursor-pointer group">
+                                <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-accent/10 to-warning/10 border border-accent/20 rounded-lg hover:border-accent/40 transition-all cursor-pointer group">
                                     <div className="relative">
                                         <Coins className="size-5 text-accent group-hover:scale-110 transition-transform" />
                                         <div className="absolute inset-0 bg-accent/20 rounded-full blur-md group-hover:bg-accent/40 transition-colors"></div>
@@ -166,6 +131,7 @@ const Navbar = () => {
                                 </div>
                             )}
 
+                            {/* Theme Toggle */}
                             <button
                                 onClick={toggleTheme}
                                 className="btn btn-square btn-ghost transition-all duration-300"
@@ -183,6 +149,7 @@ const Navbar = () => {
                                 </div>
                             </button>
 
+                            {/* GitHub Link */}
                             <a
                                 href={githubRepoUrl}
                                 target="_blank"
@@ -193,54 +160,10 @@ const Navbar = () => {
                                 <Github className="size-5" />
                             </a>
 
-                            {isLoggedIn && (
-                                <div className="notification-dropdown relative">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            setNotificationOpen(!notificationOpen)
-                                        }}
-                                        className="btn btn-square btn-ghost relative"
-                                        aria-label="Notifications"
-                                    >
-                                        <Bell className="size-5 text-base-content" />
-                                        {unreadCount > 0 && (
-                                            <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-error text-[10px] font-bold text-white animate-pulse">
-                                                {unreadCount > 9 ? '9+' : unreadCount}
-                                            </span>
-                                        )}
-                                    </button>
-                                    {notificationOpen && (
-                                        <div className="absolute right-0 mt-3 w-80 rounded-xl bg-base-100 shadow-xl border border-base-300 overflow-hidden">
-                                            <div className="px-4 py-3 border-b border-base-300 bg-base-200">
-                                                <div className="flex items-center justify-between">
-                                                    <h3 className="font-bold text-base">Notifications</h3>
-                                                    <span className="badge badge-primary badge-sm">{unreadCount} New</span>
-                                                </div>
-                                            </div>
-                                            <div className="max-h-96 overflow-y-auto">
-                                                {notifications.map((notification) => (
-                                                    <div
-                                                        key={notification.id}
-                                                        className={`px-4 py-3 hover:bg-base-200/50 cursor-pointer transition-colors border-b border-base-300 ${!notification.read ? 'bg-primary/5' : ''
-                                                            }`}
-                                                    >
-                                                        <p className="text-sm font-medium text-base-content">{notification.title}</p>
-                                                        <p className="text-xs text-base-content/60 mt-1">{notification.message}</p>
-                                                        <p className="text-xs text-primary mt-1">{notification.time}</p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <div className="px-4 py-3 border-t border-base-300 bg-base-200">
-                                                <button className="text-sm text-primary hover:text-primary/80 font-medium w-full text-center">
-                                                    View All Notifications
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                            {/* Notification Dropdown - Only for logged-in users */}
+                            {isLoggedIn && <NotificationDropdown />}
 
+                            {/* Auth Buttons - Not logged in */}
                             {!isLoggedIn && (
                                 <div className="hidden lg:flex items-center gap-2">
                                     <NavLink to="/login" className="btn btn-ghost">
@@ -252,6 +175,7 @@ const Navbar = () => {
                                 </div>
                             )}
 
+                            {/* User Menu - Desktop */}
                             {isLoggedIn && user && (
                                 <div className="hidden lg:block dropdown dropdown-end">
                                     <button
@@ -316,6 +240,7 @@ const Navbar = () => {
                                 </div>
                             )}
 
+                            {/* Mobile Menu Toggle */}
                             <button
                                 onClick={toggleMenu}
                                 className="lg:hidden btn btn-square btn-ghost"
@@ -336,13 +261,15 @@ const Navbar = () => {
                     </div>
                 </div>
 
+                {/* Mobile Menu */}
                 <div
                     className={`lg:hidden border-t border-base-300 bg-base-100 transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
                         }`}
                 >
                     <div className="container mx-auto px-4 py-6 space-y-4">
+                        {/* User Profile Card - Mobile */}
                         {isLoggedIn && user && (
-                            <div className="bg-linear-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-4">
+                            <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-4">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="avatar">
                                         <div className="w-14 rounded-full ring-2 ring-primary">
@@ -368,6 +295,7 @@ const Navbar = () => {
                             </div>
                         )}
 
+                        {/* Navigation Links - Mobile */}
                         <nav className="space-y-1">
                             {currentLinks.map((link) => {
                                 const Icon = link.icon
@@ -390,6 +318,7 @@ const Navbar = () => {
                             })}
                         </nav>
 
+                        {/* Auth Buttons - Mobile (Not logged in) */}
                         {!isLoggedIn && (
                             <>
                                 <div className="divider my-2"></div>
@@ -402,6 +331,7 @@ const Navbar = () => {
                             </>
                         )}
 
+                        {/* User Actions - Mobile (Logged in) */}
                         {isLoggedIn && (
                             <>
                                 <div className="divider my-2"></div>
@@ -418,6 +348,7 @@ const Navbar = () => {
                             </>
                         )}
 
+                        {/* GitHub Link - Mobile */}
                         <div className="pt-4 border-t border-base-300">
                             <a
                                 href={githubRepoUrl}
@@ -433,6 +364,8 @@ const Navbar = () => {
                     </div>
                 </div>
             </header>
+
+            {/* Spacer to prevent content from going under fixed navbar */}
             <div className="h-16"></div>
         </>
     )

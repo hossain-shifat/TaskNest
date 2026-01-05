@@ -2,11 +2,13 @@ import React, { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import useAxiosSecure from '../../../hooks/UseAxiosSecure'
 import useAuth from '../../../hooks/useAuth'
-import { AlertCircle, Plus } from 'lucide-react'
+import { AlertCircle, Plus, Upload, X } from 'lucide-react'
 import gsap from 'gsap'
 import Swal from 'sweetalert2'
+import axios from 'axios'
+import useAxiosSecure from '../../../hooks/useAxiosSecure'
+import { useState } from 'react'
 
 const AddTask = () => {
     const { user } = useAuth()
@@ -14,22 +16,88 @@ const AddTask = () => {
     const queryClient = useQueryClient()
     const navigate = useNavigate()
     const formRef = useRef(null)
-    const { register, handleSubmit, reset, watch, formState: { errors } } = useForm()
+    const fileInputRef = useRef(null)
+    const { register, handleSubmit, reset, watch, formState: { errors }, setValue } = useForm()
+
+    const [uploadingImage, setUploadingImage] = useState(false)
+    const [imagePreview, setImagePreview] = useState(null)
+    const [uploadedImageUrl, setUploadedImageUrl] = useState('')
+    const [uploadError, setUploadError] = useState('')
 
     const requiredWorkers = watch('required_workers', 0)
     const payableAmount = watch('payable_amount', 0)
     const totalCost = requiredWorkers * payableAmount
 
-    useEffect(() => {
-        gsap.from(formRef.current, {
-            y: 30,
-            opacity: 0,
-            duration: 0.5,
-            ease: 'power2.out'
-        })
-    }, [])
+    // Handle image upload to imgBB
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            setUploadError('Please select a valid image file')
+            return
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            setUploadError('Image size must be less than 5MB')
+            return
+        }
+
+        setUploadingImage(true)
+        setUploadError('')
+
+        try {
+            // Create preview
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setImagePreview(reader.result)
+            }
+            reader.readAsDataURL(file)
+
+            // Upload to imgBB
+            const formData = new FormData()
+            formData.append('image', file)
+
+            const response = await axios.post(
+                `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMG_HOST}`,
+                formData
+            )
+
+            if (response.data.success) {
+                const imageUrl = response.data.data.display_url
+                setUploadedImageUrl(imageUrl)
+                setValue('task_image_url', imageUrl)
+            } else {
+                throw new Error('Upload failed')
+            }
+        } catch (error) {
+            console.error('Image upload error:', error)
+            setUploadError('Failed to upload image. Please try again.')
+            setImagePreview(null)
+        } finally {
+            setUploadingImage(false)
+        }
+    }
+
+    // Remove uploaded image
+    const handleRemoveImage = () => {
+        setImagePreview(null)
+        setUploadedImageUrl('')
+        setValue('task_image_url', '')
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+        }
+    }
 
     const onSubmit = async (data) => {
+        // Validate image is uploaded
+        if (!uploadedImageUrl) {
+            setUploadError('Please upload a task image')
+            return
+        }
+
         try {
             const task = {
                 task_title: data.task_title,
@@ -38,7 +106,7 @@ const AddTask = () => {
                 payable_amount: parseInt(data.payable_amount),
                 completion_date: data.completion_date,
                 submission_info: data.submission_info,
-                task_image_url: data.task_image_url,
+                task_image_url: uploadedImageUrl,
                 buyerEmail: user.email,
                 buyerName: user.displayName
             }
@@ -63,6 +131,7 @@ const AddTask = () => {
 
             Swal.fire('Success!', 'Task created successfully!', 'success')
             reset()
+            handleRemoveImage()
             queryClient.invalidateQueries(['buyer-stats'])
             queryClient.invalidateQueries(['user-data'])
         } catch (error) {
@@ -206,18 +275,73 @@ const AddTask = () => {
                         )}
                     </div>
 
-                    {/* Task Image URL */}
+                    {/* Task Image Upload */}
                     <div className="form-control">
                         <label className="label pb-1">
-                            <span className="label-text text-sm font-medium">Task Image URL *</span>
+                            <span className="label-text text-sm font-medium">Task Image *</span>
                         </label>
+
+                        {!imagePreview ? (
+                            <div className="relative">
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                    id="task-image-upload"
+                                />
+                                <label
+                                    htmlFor="task-image-upload"
+                                    className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-base-300 rounded-lg cursor-pointer hover:border-primary transition-colors bg-base-100"
+                                >
+                                    <Upload className="w-10 h-10 text-base-content/40 mb-2" />
+                                    <span className="text-sm text-base-content/60 font-medium">
+                                        {uploadingImage ? 'Uploading...' : 'Click to upload task image'}
+                                    </span>
+                                    <span className="text-xs text-base-content/40 mt-1">
+                                        PNG, JPG up to 5MB
+                                    </span>
+                                </label>
+                            </div>
+                        ) : (
+                            <div className="relative w-full h-40 border-2 border-base-300 rounded-lg overflow-hidden">
+                                <img
+                                    src={imagePreview}
+                                    alt="Task preview"
+                                    className="w-full h-full object-cover"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleRemoveImage}
+                                    className="absolute top-2 right-2 btn btn-circle btn-sm btn-error"
+                                    disabled={uploadingImage}
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        )}
+
+                        {uploadingImage && (
+                            <div className="mt-2">
+                                <progress className="progress progress-primary w-full"></progress>
+                            </div>
+                        )}
+
+                        {uploadError && (
+                            <label className="label pt-1">
+                                <span className="label-text-alt text-error text-xs">{uploadError}</span>
+                            </label>
+                        )}
+
+                        {/* Hidden input for form validation */}
                         <input
-                            {...register('task_image_url', { required: 'Image URL is required' })}
-                            type="url"
-                            className="input input-sm input-bordered w-full"
-                            placeholder="https://example.com/image.jpg"
+                            type="hidden"
+                            {...register('task_image_url', {
+                                required: 'Task image is required'
+                            })}
                         />
-                        {errors.task_image_url && (
+                        {errors.task_image_url && !uploadedImageUrl && (
                             <label className="label pt-1">
                                 <span className="label-text-alt text-error text-xs">{errors.task_image_url.message}</span>
                             </label>
@@ -231,6 +355,7 @@ const AddTask = () => {
                     <button
                         type="submit"
                         className="btn btn-primary btn-sm w-full gap-2"
+                        disabled={uploadingImage}
                     >
                         <Plus size={18} />
                         Create Task
@@ -244,6 +369,7 @@ const AddTask = () => {
                 <p>• Be specific in your task description to get better results</p>
                 <p>• Set realistic deadlines for task completion</p>
                 <p>• Clearly state what proof of completion you need</p>
+                <p>• Upload an attractive image to get more workers interested</p>
             </div>
         </div>
     )
