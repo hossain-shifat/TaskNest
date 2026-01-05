@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import { useQueryClient } from '@tanstack/react-query'
+import useAxiosSecure from '../../../hooks/useAxiosSecure'
 import { CheckCircle, DollarSign } from 'lucide-react'
-import useAxiosSecure from '../../../hooks/UseAxiosSecure'
 
 const PaymentSuccess = () => {
     const [searchParams] = useSearchParams()
@@ -11,11 +11,15 @@ const PaymentSuccess = () => {
     const queryClient = useQueryClient()
     const [paymentData, setPaymentData] = useState(null)
     const [loading, setLoading] = useState(true)
+    const hasVerified = useRef(false) // Prevent double verification
 
     useEffect(() => {
         const sessionId = searchParams.get('session_id')
 
-        if (sessionId) {
+        // Prevent duplicate API calls in Strict Mode
+        if (sessionId && !hasVerified.current) {
+            hasVerified.current = true // Mark as verified
+
             axiosSecure.patch(`/payment-success?session_id=${sessionId}`)
                 .then(res => {
                     setPaymentData(res.data)
@@ -29,7 +33,7 @@ const PaymentSuccess = () => {
                     setLoading(false)
                 })
         }
-    }, [searchParams])
+    }, [searchParams, axiosSecure, queryClient])
 
     if (loading) {
         return (
