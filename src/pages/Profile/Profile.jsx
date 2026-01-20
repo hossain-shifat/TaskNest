@@ -3,14 +3,14 @@ import { Camera, Edit2, Save, X, Coins, TrendingUp, Clock, CheckCircle, Users, D
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AuthContext } from '../../context/Auth/AuthCOntext';
-import useAxiosSecure from '../../hooks/UseAxiosSecure';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
  * Profile Component
  * Modern social media-style profile page with role-based sections
- * Features editable profile, GSAP animations, and responsive design
+ * Features editable profile, GSAP animations, imgBB upload, and responsive design
  */
 
 const Profile = () => {
@@ -24,6 +24,8 @@ const Profile = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [uploadingPhoto, setUploadingPhoto] = useState(false);
+    const [uploadingBanner, setUploadingBanner] = useState(false);
 
     // Edit form state
     const [editForm, setEditForm] = useState({
@@ -39,6 +41,108 @@ const Profile = () => {
     const statsRef = useRef(null);
     const aboutRef = useRef(null);
     const activityRef = useRef(null);
+
+    // imgBB Upload Function
+    const uploadToImgBB = async (imageFile) => {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+
+        try {
+            const response = await fetch(
+                `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMG_HOST}`,
+                {
+                    method: 'POST',
+                    body: formData,
+                }
+            );
+
+            const data = await response.json();
+
+            if (data.success) {
+                return data.data.display_url;
+            } else {
+                throw new Error('Image upload failed');
+            }
+        } catch (error) {
+            console.error('Error uploading to imgBB:', error);
+            throw error;
+        }
+    };
+
+    // Handle Profile Photo Upload
+    const handlePhotoUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select a valid image file');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should be less than 5MB');
+            return;
+        }
+
+        setUploadingPhoto(true);
+        try {
+            const imageUrl = await uploadToImgBB(file);
+            setEditForm({ ...editForm, photoURL: imageUrl });
+
+            // Show success feedback
+            gsap.to(profileCardRef.current, {
+                scale: 1.02,
+                duration: 0.2,
+                yoyo: true,
+                repeat: 1,
+                ease: 'power2.inOut'
+            });
+        } catch (error) {
+            alert('Failed to upload image. Please try again.');
+        } finally {
+            setUploadingPhoto(false);
+        }
+    };
+
+    // Handle Banner Upload
+    const handleBannerUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select a valid image file');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should be less than 5MB');
+            return;
+        }
+
+        setUploadingBanner(true);
+        try {
+            const imageUrl = await uploadToImgBB(file);
+            setEditForm({ ...editForm, bannerURL: imageUrl });
+
+            // Show success feedback
+            gsap.to(bannerRef.current, {
+                scale: 1.01,
+                opacity:100,
+                duration: 0.2,
+                yoyo: true,
+                repeat: 1,
+                ease: 'power2.inOut'
+            });
+        } catch (error) {
+            alert('Failed to upload banner. Please try again.');
+        } finally {
+            setUploadingBanner(false);
+        }
+    };
 
     // Fetch user data
     useEffect(() => {
@@ -421,7 +525,7 @@ const Profile = () => {
             {/* Banner Section */}
             <div ref={bannerRef} className="relative h-48 md:h-64 lg:h-80 overflow-hidden">
                 <img
-                    src={userData?.bannerURL || 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200'}
+                    src={editForm.bannerURL || userData?.bannerURL || 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200'}
                     alt="Profile Banner"
                     className="w-full h-full object-cover"
                 />
@@ -429,24 +533,14 @@ const Profile = () => {
 
                 {isEditMode && (
                     <div className="absolute top-4 right-4">
-                        <label className="btn btn-sm btn-circle btn-primary">
-                            <Camera className="w-4 h-4" />
+                        <label className={`btn btn-sm btn-circle btn-primary ${uploadingBanner ? 'loading' : ''}`}>
+                            {!uploadingBanner && <Camera className="w-4 h-4" />}
                             <input
                                 type="file"
                                 className="hidden"
                                 accept="image/*"
-                                onChange={(e) => {
-                                    // Handle banner image upload
-                                    const file = e.target.files[0];
-                                    if (file) {
-                                        // In production, upload to storage and get URL
-                                        const reader = new FileReader();
-                                        reader.onloadend = () => {
-                                            setEditForm({ ...editForm, bannerURL: reader.result });
-                                        };
-                                        reader.readAsDataURL(file);
-                                    }
-                                }}
+                                onChange={handleBannerUpload}
+                                disabled={uploadingBanner}
                             />
                         </label>
                     </div>
@@ -463,26 +557,18 @@ const Profile = () => {
                                 <div className="relative flex-shrink-0">
                                     <div className="avatar">
                                         <div className="w-32 h-32 md:w-40 md:h-40 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                            <img src={userData?.photoURL || 'https://via.placeholder.com/150'} alt="Profile" />
+                                            <img src={editForm.photoURL || userData?.photoURL || 'https://via.placeholder.com/150'} alt="Profile" />
                                         </div>
                                     </div>
                                     {isEditMode && (
-                                        <label className="absolute bottom-0 right-0 btn btn-sm btn-circle btn-primary">
-                                            <Camera className="w-4 h-4" />
+                                        <label className={`absolute bottom-0 right-0 btn btn-sm btn-circle btn-primary ${uploadingPhoto ? 'loading' : ''}`}>
+                                            {!uploadingPhoto && <Camera className="w-4 h-4" />}
                                             <input
                                                 type="file"
                                                 className="hidden"
                                                 accept="image/*"
-                                                onChange={(e) => {
-                                                    const file = e.target.files[0];
-                                                    if (file) {
-                                                        const reader = new FileReader();
-                                                        reader.onloadend = () => {
-                                                            setEditForm({ ...editForm, photoURL: reader.result });
-                                                        };
-                                                        reader.readAsDataURL(file);
-                                                    }
-                                                }}
+                                                onChange={handlePhotoUpload}
+                                                disabled={uploadingPhoto}
                                             />
                                         </label>
                                     )}
@@ -503,8 +589,8 @@ const Profile = () => {
                                     )}
                                     <div className="flex items-center gap-2 mb-4">
                                         <span className={`badge ${userData?.role === 'admin' ? 'badge-admin' :
-                                                userData?.role === 'buyer' ? 'badge-buyer' :
-                                                    'badge-worker'
+                                            userData?.role === 'buyer' ? 'badge-buyer' :
+                                                'badge-worker'
                                             } badge-lg`}>
                                             {userData?.role?.toUpperCase()}
                                         </span>
@@ -519,7 +605,7 @@ const Profile = () => {
                                             <button
                                                 onClick={handleUpdateProfile}
                                                 className="btn btn-primary btn-sm gap-2"
-                                                disabled={saving}
+                                                disabled={saving || uploadingPhoto || uploadingBanner}
                                             >
                                                 {saving ? (
                                                     <span className="loading loading-spinner loading-xs"></span>
@@ -531,7 +617,7 @@ const Profile = () => {
                                             <button
                                                 onClick={handleCancelEdit}
                                                 className="btn btn-ghost btn-sm gap-2"
-                                                disabled={saving}
+                                                disabled={saving || uploadingPhoto || uploadingBanner}
                                             >
                                                 <X className="w-4 h-4" />
                                                 Cancel

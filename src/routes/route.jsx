@@ -34,11 +34,13 @@ import PaymentCancel from "../pages/Dashboard/Buyer/PaymentCancel"
 // Admin Pages
 import ManageUsers from "../pages/Dashboard/Admin/ManageUsers"
 import ManageTasks from "../pages/Dashboard/Admin/ManageTasks"
+import Error from "../components/Error";
 
 export const router = createBrowserRouter([
     {
         path: '/',
         Component: Root,
+        errorElement: <Error/>,
         children: [
             {
                 index: true,
