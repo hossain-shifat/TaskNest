@@ -222,7 +222,7 @@ This project is created as part of a MERN Stack Developer assessment.
 
 ---
 
-## 🙏 Acknowledgments
+## 💡 Acknowledgments
 
 - Design inspiration from Picoworkers and Clickworker
 - Icons by Lucide React
