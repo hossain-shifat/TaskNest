@@ -187,7 +187,7 @@ npm start
 
 ## 📱 Screenshots
 
-[![Hero Image](./src/assets/hero.png)](https://github.com/hossain-shifat/TaskNest)
+[![Hero Image](./src/assets/home.png)](https://github.com/hossain-shifat/TaskNest)
 *Engaging homepage with animated hero section and top workers showcase*
 
 [![Dashboard](./src/assets/dashboard.png)](https://github.com/hossain-shifat/TaskNest)
